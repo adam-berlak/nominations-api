@@ -1,11 +1,65 @@
 @NominationsApi_HostAddress = http://localhost:5034
 
-GET {{NominationsApi_HostAddress}}/openapi/v1.json
+### List all nominations
+GET {{NominationsApi_HostAddress}}/api/nominations
 Accept: application/json
 
 ###
 
-GET {{NominationsApi_HostAddress}}/weatherforecast/
+### Get nomination by ID
+GET {{NominationsApi_HostAddress}}/api/nominations/1
 Accept: application/json
+
+###
+
+### Create a nomination
+POST {{NominationsApi_HostAddress}}/api/nominations
+Content-Type: application/json
+
+{
+  "shipperId": "SHIPPER-A",
+  "pipelineSegment": "MAINLINE-NORTH",
+  "requestedVolume": 500.0
+}
+
+###
+
+### Create a second nomination on the same segment
+POST {{NominationsApi_HostAddress}}/api/nominations
+Content-Type: application/json
+
+{
+  "shipperId": "SHIPPER-B",
+  "pipelineSegment": "MAINLINE-NORTH",
+  "requestedVolume": 750.0
+}
+
+###
+
+### Update a nomination
+PUT {{NominationsApi_HostAddress}}/api/nominations/1
+Content-Type: application/json
+
+{
+  "shipperId": "SHIPPER-A",
+  "pipelineSegment": "MAINLINE-NORTH",
+  "requestedVolume": 600.0,
+  "status": "Pending"
+}
+
+###
+
+### Delete a nomination
+DELETE {{NominationsApi_HostAddress}}/api/nominations/1
+
+###
+
+### Schedule a segment (total 1250 > capacity 1000 — proportional cut)
+POST {{NominationsApi_HostAddress}}/api/nominations/schedule/MAINLINE-NORTH
+Content-Type: application/json
+
+{
+  "capacity": 1000.0
+}
 
 ###
