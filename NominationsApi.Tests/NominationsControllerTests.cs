@@ -35,7 +35,7 @@ public class NominationsControllerTests : IClassFixture<WebApplicationFactory<Pr
     [Fact]
     public async Task Create_ValidRequest_Returns201WithPendingStatus()
     {
-        var request = new CreateNominationRequest("SHIPPER-CR", "SEG-CR", 500m, null);
+        var request = new CreateNominationRequest("SHIPPER-CR", "SEG-CR", 500m);
 
         var response = await _client.PostAsJsonAsync("/api/nominations", request);
 
@@ -113,14 +113,15 @@ public class NominationsControllerTests : IClassFixture<WebApplicationFactory<Pr
         Assert.Equal(NominationStatus.Cut, result.Outcome);
         Assert.Equal(1000m, result.TotalRequested);
         Assert.All(result.Nominations, n => Assert.Equal(NominationStatus.Cut, n.Status));
-        var totalAllocated = result.Nominations.Sum(n => n.ScheduledVolume);
+        var totalAllocated = result.Nominations.Sum(n => n.ScheduledVolume ?? 0m);
         Assert.True(totalAllocated <= 500m,
             $"Total allocated {totalAllocated} should not exceed capacity 500");
+        Assert.Equal(600m, result.Nominations.First(n => n.ShipperId == "SX").RequestedVolume);
     }
 
     private async Task<Nomination> CreateNomination(string shipperId, string segment, decimal volume)
     {
-        var request = new CreateNominationRequest(shipperId, segment, volume, null);
+        var request = new CreateNominationRequest(shipperId, segment, volume);
         var response = await _client.PostAsJsonAsync("/api/nominations", request);
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<Nomination>())!;

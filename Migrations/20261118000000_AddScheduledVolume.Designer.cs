@@ -12,7 +12,7 @@ namespace NominationsApi.Migrations;
 
 [DbContext(typeof(NominationsDbContext))]
 [Migration("20261118000000_AddScheduledVolume")]
-partial class _20261118000000_AddScheduledVolume
+partial class AddScheduledVolume
 {
     /// <inheritdoc />
     protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,7 @@ partial class _20261118000000_AddScheduledVolume
                     .HasPrecision(18, 4)
                     .HasColumnType("TEXT");
 
-                b.Property<decimal>("ScheduledVolume")
+                b.Property<decimal?>("ScheduledVolume")
                     .HasPrecision(18, 4)
                     .HasColumnType("TEXT");
 

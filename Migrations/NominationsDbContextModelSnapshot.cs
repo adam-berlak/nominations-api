@@ -40,7 +40,7 @@ partial class NominationsDbContextModelSnapshot : ModelSnapshot
                     .HasPrecision(18, 4)
                     .HasColumnType("TEXT");
 
-                b.Property<decimal>("ScheduledVolume")
+                b.Property<decimal?>("ScheduledVolume")
                     .HasPrecision(18, 4)
                     .HasColumnType("TEXT");
 

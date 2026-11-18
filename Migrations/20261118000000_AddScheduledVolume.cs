@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NominationsApi.Migrations;
 
 /// <inheritdoc />
-public partial class _20261118000000_AddScheduledVolume : Migration
+public partial class AddScheduledVolume : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,8 +16,7 @@ public partial class _20261118000000_AddScheduledVolume : Migration
             type: "TEXT",
             precision: 18,
             scale: 4,
-            nullable: false,
-            defaultValue: 0m);
+            nullable: true);
     }
 
     /// <inheritdoc />
