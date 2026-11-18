@@ -21,7 +21,7 @@ A REST API for managing natural gas pipeline nominations. Shippers submit volume
 { "capacity": 1000.0 }
 ```
 
-If the total requested volume across all pending nominations for the segment is at or below the capacity, every nomination is **Confirmed**. If demand exceeds capacity, each nomination's volume is cut proportionally so the total fits within the capacity, and all are marked **Cut**.
+If the total requested volume across all pending nominations for the segment is at or below the capacity, every nomination is **Confirmed**. If demand exceeds capacity, each nomination is marked **Cut** and receives a `scheduledVolume` proportional to its share of total demand. The original `requestedVolume` is preserved.
 
 ```json
 {
@@ -30,8 +30,8 @@ If the total requested volume across all pending nominations for the segment is 
   "capacity": 1000.0,
   "outcome": "Cut",
   "nominations": [
-    { "id": 1, "shipperId": "SHIPPER-A", "requestedVolume": 400.0, "status": "Cut" },
-    { "id": 2, "shipperId": "SHIPPER-B", "requestedVolume": 266.6667, "status": "Cut" }
+    { "id": 1, "shipperId": "SHIPPER-A", "requestedVolume": 600.0, "scheduledVolume": 400.0, "status": "Cut" },
+    { "id": 2, "shipperId": "SHIPPER-B", "requestedVolume": 900.0, "scheduledVolume": 600.0, "status": "Cut" }
   ]
 }
 ```
@@ -45,7 +45,7 @@ If the total requested volume across all pending nominations for the segment is 
 ## Run Locally
 
 ```bash
-dotnet run --project NominationsApi
+dotnet run
 ```
 
 The API starts on `http://localhost:5034`. Open `/openapi/v1.json` or use the included `NominationsApi.http` file to explore endpoints.
@@ -60,7 +60,7 @@ docker run -p 8080:8080 nominations-api
 ## Run Tests
 
 ```bash
-dotnet test
+dotnet test NominationsApi.Tests
 ```
 
 Tests use an in-memory database provider so no SQLite file or running server is needed.

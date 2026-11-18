@@ -41,7 +41,7 @@ public class NominationsController(NominationsDbContext db) : ControllerBase
             ShipperId = request.ShipperId,
             PipelineSegment = request.PipelineSegment,
             RequestedVolume = request.RequestedVolume,
-            Status = string.IsNullOrWhiteSpace(request.Status) ? NominationStatus.Pending : request.Status,
+            Status = NominationStatus.Pending,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -109,7 +109,10 @@ public class NominationsController(NominationsDbContext db) : ControllerBase
         if (totalRequested <= request.Capacity)
         {
             foreach (var n in nominations)
+            {
+                n.ScheduledVolume = n.RequestedVolume;
                 n.Status = NominationStatus.Confirmed;
+            }
             outcome = NominationStatus.Confirmed;
         }
         else
@@ -117,7 +120,7 @@ public class NominationsController(NominationsDbContext db) : ControllerBase
             var ratio = request.Capacity / totalRequested;
             foreach (var n in nominations)
             {
-                n.RequestedVolume = Math.Round(n.RequestedVolume * ratio, 4);
+                n.ScheduledVolume = Math.Floor(n.RequestedVolume * ratio * 10000m) / 10000m;
                 n.Status = NominationStatus.Cut;
             }
             outcome = NominationStatus.Cut;

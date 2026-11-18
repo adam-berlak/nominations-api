@@ -113,7 +113,7 @@ public class NominationsControllerTests : IClassFixture<WebApplicationFactory<Pr
         Assert.Equal(NominationStatus.Cut, result.Outcome);
         Assert.Equal(1000m, result.TotalRequested);
         Assert.All(result.Nominations, n => Assert.Equal(NominationStatus.Cut, n.Status));
-        var totalAllocated = result.Nominations.Sum(n => n.RequestedVolume);
+        var totalAllocated = result.Nominations.Sum(n => n.ScheduledVolume);
         Assert.True(totalAllocated <= 500m,
             $"Total allocated {totalAllocated} should not exceed capacity 500");
     }

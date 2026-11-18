@@ -15,7 +15,7 @@ partial class NominationsDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261115073224_InitialCreate";
+    public override string LastMigrationId => "20261118000000_AddScheduledVolume";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -37,6 +37,10 @@ partial class NominationsDbContextModelSnapshot : ModelSnapshot
                     .HasColumnType("TEXT");
 
                 b.Property<decimal>("RequestedVolume")
+                    .HasPrecision(18, 4)
+                    .HasColumnType("TEXT");
+
+                b.Property<decimal>("ScheduledVolume")
                     .HasPrecision(18, 4)
                     .HasColumnType("TEXT");
 
