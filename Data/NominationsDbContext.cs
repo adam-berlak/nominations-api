@@ -5,6 +5,7 @@ namespace NominationsApi.Data;
 
 public class NominationsDbContext(DbContextOptions<NominationsDbContext> options) : DbContext(options)
 {
+    public DbSet<ScheduleRun> ScheduleRuns => Set<ScheduleRun>();
     public DbSet<Nomination> Nominations => Set<Nomination>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,6 +33,27 @@ public class NominationsDbContext(DbContextOptions<NominationsDbContext> options
                 .IsRequired();
 
             entity.HasIndex(n => n.ShipperId);
+        });
+
+        modelBuilder.Entity<ScheduleRun>(entity =>
+        {
+            entity.HasKey(s => s.Id);
+
+            entity.Property(s => s.PipelineSegment)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(s => s.Capacity)
+                .HasPrecision(18, 4);
+
+            entity.Property(s => s.TotalRequested)
+                .HasPrecision(18, 4);
+
+            entity.Property(s => s.Outcome)
+                .IsRequired()
+                .HasMaxLength(30);
+
+            entity.HasIndex(s => s.PipelineSegment);
         });
     }
 }

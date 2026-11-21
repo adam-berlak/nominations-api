@@ -15,7 +15,7 @@ partial class NominationsDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261118000000_AddScheduledVolume";
+    public override string LastMigrationId => "20261121000000_AddScheduleRuns";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -59,6 +59,40 @@ partial class NominationsDbContextModelSnapshot : ModelSnapshot
                 b.HasIndex("ShipperId");
 
                 b.ToTable("Nominations");
+            });
+
+        modelBuilder.Entity("NominationsApi.Models.ScheduleRun", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("INTEGER");
+
+                b.Property<decimal>("Capacity")
+                    .HasPrecision(18, 4)
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("Outcome")
+                    .IsRequired()
+                    .HasMaxLength(30)
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("PipelineSegment")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("TEXT");
+
+                b.Property<DateTime>("RanAt")
+                    .HasColumnType("TEXT");
+
+                b.Property<decimal>("TotalRequested")
+                    .HasPrecision(18, 4)
+                    .HasColumnType("TEXT");
+
+                b.HasKey("Id");
+
+                b.HasIndex("PipelineSegment");
+
+                b.ToTable("ScheduleRuns");
             });
 #pragma warning restore 612, 618
     }

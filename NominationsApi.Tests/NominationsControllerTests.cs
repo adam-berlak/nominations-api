@@ -126,4 +126,52 @@ public class NominationsControllerTests : IClassFixture<WebApplicationFactory<Pr
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<Nomination>())!;
     }
+
+    [Fact]
+    public async Task Schedule_SavesHistoryRecord()
+    {
+        var client = _client;
+
+        await client.PostAsJsonAsync("/api/nominations",
+            new CreateNominationRequest("SHIPPER-H", "SEG-H", 300m));
+
+        await _client.PostAsJsonAsync("/api/nominations/schedule/SEG-H", 
+            new ScheduleRequest(1000m));
+
+        var historyResponse = await client.GetAsync("/api/nominations/SEG-H/history");
+        historyResponse.EnsureSuccessStatusCode();
+
+        var history = await historyResponse.Content
+            .ReadFromJsonAsync<List<ScheduleRun>>();
+
+        Assert.NotNull(history);
+        Assert.Single(history);
+        Assert.Equal("SEG-H", history[0].PipelineSegment);
+        Assert.Equal(1000m, history[0].Capacity);
+        Assert.Equal(300m, history[0].TotalRequested);
+        Assert.Equal("Confirmed", history[0].Outcome);
+    }
+
+    [Fact]
+    public async Task Schedule_HistoryRecordsMultipleRuns()
+    {
+        await _client.PostAsJsonAsync("/api/nominations",
+            new CreateNominationRequest("SHIPPER-H2A", "SEG-H2", 300m));
+
+        await _client.PostAsJsonAsync("/api/nominations/schedule/SEG-H2",
+            new ScheduleRequest(1000m));
+
+        await _client.PostAsJsonAsync("/api/nominations",
+            new CreateNominationRequest("SHIPPER-H2B", "SEG-H2", 200m));
+
+        await _client.PostAsJsonAsync("/api/nominations/schedule/SEG-H2",
+            new ScheduleRequest(500m));
+
+        var historyResponse = await _client.GetAsync("/api/nominations/SEG-H2/history");
+        var history = await historyResponse.Content
+            .ReadFromJsonAsync<List<ScheduleRun>>();
+
+        Assert.NotNull(history);
+        Assert.Equal(2, history.Count);
+    }
 }

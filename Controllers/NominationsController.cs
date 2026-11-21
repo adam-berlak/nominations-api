@@ -128,6 +128,29 @@ public class NominationsController(NominationsDbContext db) : ControllerBase
 
         await db.SaveChangesAsync(ct);
 
+        var run = new ScheduleRun
+        {
+            PipelineSegment = segment,
+            RanAt = DateTime.UtcNow,
+            Capacity = request.Capacity,
+            TotalRequested = totalRequested,
+            Outcome = outcome
+        };
+        
+        db.ScheduleRuns.Add(run);
+        await db.SaveChangesAsync();
+
         return Ok(new ScheduleResult(segment, totalRequested, request.Capacity, outcome, nominations));
+    }
+
+    [HttpGet("{segment}/history")]
+    public async Task<IActionResult> GetHistory(string segment)
+    {
+        var history = await db.ScheduleRuns
+            .Where(r => r.PipelineSegment == segment)
+            .OrderByDescending(r => r.RanAt)
+            .ToListAsync();
+
+        return Ok(history);
     }
 }
