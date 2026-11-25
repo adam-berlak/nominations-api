@@ -48,6 +48,24 @@ if (!app.Environment.IsEnvironment("Testing"))
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<NominationsDbContext>();
     db.Database.Migrate();
+
+    // Safety net: EF migration history can get out of sync with the actual schema
+    // when Railway redeploys with ephemeral storage. These statements are idempotent
+    // and ensure the ScheduleRuns table always exists after startup.
+    db.Database.ExecuteSqlRaw("""
+        CREATE TABLE IF NOT EXISTS "ScheduleRuns" (
+            "Id"              INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+            "PipelineSegment" TEXT    NOT NULL,
+            "RanAt"           TEXT    NOT NULL,
+            "Capacity"        TEXT    NOT NULL,
+            "TotalRequested"  TEXT    NOT NULL,
+            "Outcome"         TEXT    NOT NULL
+        )
+        """);
+    db.Database.ExecuteSqlRaw("""
+        CREATE INDEX IF NOT EXISTS "IX_ScheduleRuns_PipelineSegment"
+        ON "ScheduleRuns" ("PipelineSegment")
+        """);
 }
 
 app.Run();
