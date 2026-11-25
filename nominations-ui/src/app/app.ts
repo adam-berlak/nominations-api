@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { NominationService } from './services/nomination.service';
 import { Nomination, CreateNominationRequest, ScheduleResult } from './models/nomination';
 
@@ -25,10 +26,15 @@ export class App implements OnInit {
     capacity: 0
   };
 
-  constructor(private nominationService: NominationService) {}
+  constructor(
+    private nominationService: NominationService,
+    @Inject(PLATFORM_ID) private platformId: object
+  ) {}
 
   ngOnInit(): void {
-    this.loadNominations();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadNominations();
+    }
   }
 
   loadNominations(): void {
