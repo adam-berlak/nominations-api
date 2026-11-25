@@ -23,7 +23,17 @@ builder.Services.AddDbContext<NominationsDbContext>((serviceProvider, options) =
             ?? throw new InvalidOperationException("Connection string 'Nominations' not found."));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
+
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {
