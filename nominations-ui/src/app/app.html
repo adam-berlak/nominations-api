@@ -1,0 +1,124 @@
+<div class="container">
+  <h1>Nominations Dashboard</h1>
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+
+  <div class="panels">
+    <!-- Create Nomination -->
+    <section class="panel">
+      <h2>Create Nomination</h2>
+      <form (ngSubmit)="createNomination()" #createFormRef="ngForm">
+        <div class="field">
+          <label>Shipper ID</label>
+          <input
+            [(ngModel)]="createForm.shipperId"
+            name="shipperId"
+            placeholder="e.g. ACME-CORP"
+            required
+          />
+        </div>
+        <div class="field">
+          <label>Pipeline Segment</label>
+          <input
+            [(ngModel)]="createForm.pipelineSegment"
+            name="pipelineSegment"
+            placeholder="e.g. SEG-NORTH"
+            required
+          />
+        </div>
+        <div class="field">
+          <label>Requested Volume</label>
+          <input
+            [(ngModel)]="createForm.requestedVolume"
+            name="requestedVolume"
+            type="number"
+            min="1"
+            placeholder="e.g. 500"
+            required
+          />
+        </div>
+        <button type="submit" [disabled]="createFormRef.invalid">Submit Nomination</button>
+      </form>
+    </section>
+
+    <!-- Run Schedule -->
+    <section class="panel">
+      <h2>Run Schedule</h2>
+      <form (ngSubmit)="runSchedule()" #scheduleFormRef="ngForm">
+        <div class="field">
+          <label>Pipeline Segment</label>
+          <input
+            [(ngModel)]="scheduleForm.segment"
+            name="segment"
+            placeholder="e.g. SEG-NORTH"
+            required
+          />
+        </div>
+        <div class="field">
+          <label>Available Capacity</label>
+          <input
+            [(ngModel)]="scheduleForm.capacity"
+            name="capacity"
+            type="number"
+            min="1"
+            placeholder="e.g. 1000"
+            required
+          />
+        </div>
+        <button type="submit" [disabled]="scheduleFormRef.invalid">Run Scheduler</button>
+      </form>
+
+      <div *ngIf="scheduleResult" class="result-banner" [class.outcome-confirmed]="scheduleResult.outcome === 'Confirmed'" [class.outcome-partial]="scheduleResult.outcome === 'Partial'">
+        <strong>{{ scheduleResult.outcome }}</strong>
+        &mdash; Segment: {{ scheduleResult.pipelineSegment }},
+        Requested: {{ scheduleResult.totalRequested | number }},
+        Capacity: {{ scheduleResult.capacity | number }}
+      </div>
+    </section>
+  </div>
+
+  <!-- Nominations Table -->
+  <section class="panel full-width">
+    <div class="table-header">
+      <h2>All Nominations</h2>
+      <button class="refresh-btn" (click)="loadNominations()">Refresh</button>
+    </div>
+
+    <p *ngIf="loading">Loading...</p>
+
+    <table *ngIf="!loading && nominations.length > 0; else noData">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Shipper ID</th>
+          <th>Segment</th>
+          <th>Requested Vol.</th>
+          <th>Scheduled Vol.</th>
+          <th>Status</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let n of nominations">
+          <td>{{ n.id }}</td>
+          <td>{{ n.shipperId }}</td>
+          <td>{{ n.pipelineSegment }}</td>
+          <td>{{ n.requestedVolume | number }}</td>
+          <td>{{ n.scheduledVolume !== null ? (n.scheduledVolume | number) : '—' }}</td>
+          <td>
+            <span class="badge" [class.badge-pending]="n.status === 'Pending'" [class.badge-confirmed]="n.status === 'Confirmed'" [class.badge-partial]="n.status === 'Partial'">
+              {{ n.status }}
+            </span>
+          </td>
+          <td>{{ n.createdAt | date:'short' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noData>
+      <p *ngIf="!loading" class="empty-state">No nominations yet. Create one above.</p>
+    </ng-template>
+  </section>
+</div>
