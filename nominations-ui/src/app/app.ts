@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { NominationService } from './services/nomination.service';
 import { Nomination, CreateNominationRequest, ScheduleResult } from './models/nomination';
@@ -28,6 +28,7 @@ export class App implements OnInit {
 
   constructor(
     private nominationService: NominationService,
+    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
@@ -43,10 +44,12 @@ export class App implements OnInit {
       next: (data) => {
         this.nominations = data;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Failed to load nominations. Is the API running?';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -57,9 +60,11 @@ export class App implements OnInit {
       next: () => {
         this.loadNominations();
         this.createForm = { shipperId: '', pipelineSegment: '', requestedVolume: 0 };
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Failed to create nomination.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -73,12 +78,14 @@ export class App implements OnInit {
         next: (result) => {
           this.scheduleResult = result;
           this.loadNominations();
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.errorMessage =
             err.status === 404
               ? `No pending nominations found for segment "${this.scheduleForm.segment}".`
-              : 'Failed to run schedule.';
+              : `Failed to run schedule (status ${err.status}).`;
+          this.cdr.detectChanges();
         }
       });
   }
